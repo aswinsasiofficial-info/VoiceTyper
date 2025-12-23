@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>VoiceType</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=BBH+Bogle&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="brand">
+      <span class="gradient-text" style="font-family: 'BBH Bogle', sans-serif; font-size: 30px;">Voice.Typer</span>
+    </div>
+    <a href="{% url 'documents:dashboard' %}" class="link">History</a>
+  </header>
+
+  <section class="hero">
+    <h1><span class="gradient-text">Voice</span> to Text</h1>
+    <p>Transform your voice into perfectly formatted text.</p>
+
+    <div class="mic" id="micBtn"><ion-icon name="mic-circle" style="font-size: 50px;"></ion-icon></div>
+    <small>Tap to speak</small>
+  </section>
+
+  <form method="POST" class="doc-form">
+    {% csrf_token %}
+
+    <input type="text" name="title" class="doc-title" placeholder="Document title" required>
+
+    <div id="transcript" class="transcription-box" contenteditable="true">
+      Click the mic and start speaking...
+    </div>
+
+    <textarea name="content" id="hiddenContent" hidden></textarea>
+
+    <button type="submit" class="save-btn">Save</button>
+  </form>
+
+  <script>
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Use Google Chrome for speech recognition.");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-IN";
+
+    const micBtn = document.getElementById("micBtn");
+    const transcript = document.getElementById("transcript");
+    const hiddenContent = document.getElementById("hiddenContent");
+
+    let recording = false;
+    let finalText = "";
+
+    recognition.onresult = (event) => {
+      let interim = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += text + " ";
+        } else {
+          interim += text;
+        }
+      }
+
+      transcript.innerText = finalText + interim;
+      hiddenContent.value = finalText + interim;
+    };
+
+    micBtn.onclick = () => {
+      if (!recording) {
+        recognition.start();
+        micBtn.classList.add("active");
+      } else {
+        recognition.stop();
+        micBtn.classList.remove("active");
+      }
+      recording = !recording;
+    };
+  </script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+
+</html>
