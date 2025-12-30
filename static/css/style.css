@@ -1,5 +1,9 @@
 body {
-  background: radial-gradient(circle at top, #12172a, #0b0f1a 60%);
+  background-image:url('/static/img/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: white;
   font-family: 'Google Sans', sans-serif;
   margin: 0;
