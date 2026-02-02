@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | VoiceTyper{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'documents:editor' %}" class="link">New Document</a>
+{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <h1 class="dashboard-title">Saved Documents</h1>
+
+    {% if docs %}
+    <div class="doc-list">
+        {% for doc in docs %}
+        <div class="doc-card">
+            <div class="doc-info">
+                <h3>{{ doc.title }}</h3>
+            </div>
+
+            <div class="doc-actions">
+                <a href="{% url 'documents:update' doc.id %}" class="btn ghost">Edit</a>
+                <a href="{% url 'documents:delete' doc.id %}" class="btn danger"
+                   onclick="return confirm('Delete this document?')">
+                    Delete
+                </a>
+
+                <div class="divider"></div>
+
+                <a href="{% url 'documents:download' doc.id 'txt' %}" class="btn small">TXT</a>
+                <a href="{% url 'documents:download' doc.id 'pdf' %}" class="btn small">PDF</a>
+                <a href="{% url 'documents:download' doc.id 'docx' %}" class="btn small">DOCX</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state">No documents yet. Start recording.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Voice Editor | VoiceTyper{% endblock %}
+
+{% block nav_links %}
+    <a href="{% url 'documents:dashboard' %}" class="link">History</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1><span class="gradient-text">Voice</span> to Text</h1>
+    <p>Transform your voice into perfectly formatted text.</p>
+
+    <div class="mic" id="micBtn"><ion-icon name="mic-circle" style="font-size: 50px;"></ion-icon></div>
+    <small>Tap to speak</small>
+</section>
+
+<form method="POST" class="doc-form">
+    {% csrf_token %}
+
+    <input type="text" name="title" class="doc-title" placeholder="Document title" required>
+
+    <div id="transcript" class="transcription-box" contenteditable="true">
+        Click the mic and start speaking...
+    </div>
+
+    <textarea name="content" id="hiddenContent" hidden></textarea>
+
+    <button type="submit" class="save-btn">Save</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Use Google Chrome for speech recognition.");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-IN";
+
+    const micBtn = document.getElementById("micBtn");
+    const transcript = document.getElementById("transcript");
+    const hiddenContent = document.getElementById("hiddenContent");
+
+    let recording = false;
+    let finalText = "";
+
+    recognition.onresult = (event) => {
+        let interim = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const text = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalText += text + " ";
+            } else {
+                interim += text;
+            }
+        }
+
+        transcript.innerText = finalText + interim;
+        hiddenContent.value = finalText + interim;
+    };
+
+    micBtn.onclick = () => {
+        if (!recording) {
+            recognition.start();
+            micBtn.classList.add("active");
+        } else {
+            recognition.stop();
+            micBtn.classList.remove("active");
+        }
+        recording = !recording;
+    };
+</script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+{% endblock %}

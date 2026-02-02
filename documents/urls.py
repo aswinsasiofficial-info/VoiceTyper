@@ -9,4 +9,5 @@ urlpatterns = [
     path("update/<int:id>/", views.update_doc, name="update"),
     path("delete/<int:id>/", views.delete_doc, name="delete"),
     path("download/<int:doc_id>/<str:filetype>/", views.download, name="download"),
+
 ]

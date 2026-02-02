@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from .models import Document
 from .export import export_txt, export_pdf, export_docx
 
@@ -11,12 +12,12 @@ def editor(request):
         Document.objects.create(title=title, content=content)
         return redirect("documents:dashboard")
 
-    return render(request, "editor.html")
+    return render(request, "voice_editor.html")
 
 
 def dashboard(request):
     docs = Document.objects.all().order_by("-created_at")
-    return render(request, "dashboard.html", {"docs": docs})
+    return render(request, "document_dashboard.html", {"docs": docs})
 
 
 def update_doc(request, id):
@@ -28,7 +29,7 @@ def update_doc(request, id):
         doc.save()
         return redirect("documents:dashboard")
 
-    return render(request, "update.html", {"doc": doc})
+    return render(request, "document_editor.html", {"doc": doc})
 
 
 def delete_doc(request, id):
@@ -46,3 +47,6 @@ def download(request, doc_id, filetype):
         return export_pdf(doc.content, doc.title)
     elif filetype == "docx":
         return export_docx(doc.content, doc.title)
+
+
+
